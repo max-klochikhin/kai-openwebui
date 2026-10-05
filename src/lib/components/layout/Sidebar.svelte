@@ -75,6 +75,7 @@
 	import ChannelModal from './Sidebar/ChannelModal.svelte';
 	import ChannelItem from './Sidebar/ChannelItem.svelte';
 	import SearchModal from './SearchModal.svelte';
+	import { KAI_SINGLE_ASSISTANT } from '$lib/kai';
 	import FolderModal from './Sidebar/Folders/FolderModal.svelte';
 	import PinnedModelList from './Sidebar/PinnedModelList.svelte';
 	import PinnedNoteList from './Sidebar/PinnedNoteList.svelte';
@@ -980,6 +981,7 @@
 				</div>
 
 				<div class="-gap-0.5">
+					{#if !KAI_SINGLE_ASSISTANT}
 					<div class="">
 						<Tooltip content={$i18n.t('New Chat')} placement="right">
 							<a
@@ -1003,6 +1005,7 @@
 							</a>
 						</Tooltip>
 					</div>
+					{/if}
 
 					<div>
 						<Tooltip content={$i18n.t('Search')} placement="right">
@@ -1209,6 +1212,7 @@
 					}}
 				>
 					<div class="pb-1">
+						{#if !KAI_SINGLE_ASSISTANT}
 						<div class="px-1 flex justify-center text-gray-700 dark:text-gray-300">
 							<a
 								id="sidebar-new-chat-button"
@@ -1229,6 +1233,7 @@
 								<HotkeyHint name="newChat" className=" hover-reveal " />
 							</a>
 						</div>
+						{/if}
 
 						<div class="px-1 flex justify-center text-gray-700 dark:text-gray-300">
 							<button
@@ -1413,6 +1418,7 @@
 						</SidebarSection>
 					{/if}
 
+					{#if !KAI_SINGLE_ASSISTANT}
 					<SidebarSection
 						id="sidebar-chats"
 						name={$i18n.t('Chats')}
@@ -1699,6 +1705,7 @@
 							</div>
 						</div>
 					</SidebarSection>
+					{/if}
 				</div>
 
 				<div class="px-1 pt-1 pb-1.5 sticky bottom-0 z-10 -mt-2 sidebar">
