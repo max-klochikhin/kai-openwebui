@@ -27,6 +27,7 @@
 	import HtmlToken from './HTMLToken.svelte';
 	import Clipboard from '$lib/components/icons/Clipboard.svelte';
 	import ColonFenceBlock from './ColonFenceBlock.svelte';
+	import KaiListings from './KaiListings.svelte';
 
 	export let id: string;
 	export let chatId = '';
@@ -190,7 +191,9 @@
 			/>
 		</svelte:element>
 	{:else if token.type === 'code'}
-		{#if token.raw.includes('```')}
+		{#if token?.lang === 'kai-listings'}
+			<KaiListings code={token?.text ?? ''} />
+		{:else if token.raw.includes('```')}
 			<CodeBlock
 				id={`${id}-${tokenIdx}`}
 				collapsed={$settings?.collapseCodeBlocks ?? false}
