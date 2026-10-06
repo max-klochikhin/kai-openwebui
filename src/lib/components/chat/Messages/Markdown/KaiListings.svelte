@@ -21,7 +21,7 @@
 {:else if listings.length === 0}
 	<p class="text-sm text-gray-500 dark:text-gray-400 my-2">No listings found.</p>
 {:else}
-	<div class="grid w-full max-w-xl grid-cols-1 sm:grid-cols-2 gap-3 my-3">
+	<div class="flex w-full max-w-md flex-col gap-3 my-3">
 		{#each listings as listing (listing.id ?? listing.url)}
 			<KaiListingCard {listing} />
 		{/each}
