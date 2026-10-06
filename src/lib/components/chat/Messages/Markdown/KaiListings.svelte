@@ -12,6 +12,8 @@
 		}
 	})();
 	$: listings = Array.isArray(data?.listings) ? data.listings : [];
+	$: total = typeof data?.total === 'number' ? data.total : null;
+	$: from = typeof data?.page === 'number' && listings.length ? data.page * (data.returned ?? listings.length) + 1 : 1;
 </script>
 
 {#if !data}
@@ -22,6 +24,11 @@
 	<p class="text-sm text-gray-500 dark:text-gray-400 my-2">No listings found.</p>
 {:else}
 	<div class="flex w-full max-w-md flex-col gap-3 my-3">
+		{#if total !== null}
+			<p class="text-xs text-gray-500 dark:text-gray-400">
+				{from}–{from + listings.length - 1} / {total.toLocaleString()}
+			</p>
+		{/if}
 		{#each listings as listing (listing.id ?? listing.url)}
 			<KaiListingCard {listing} />
 		{/each}
