@@ -71,18 +71,18 @@
 			href={listing.url}
 			target="_blank"
 			rel="noreferrer"
-			class="block p-3 space-y-1 no-underline hover:bg-gray-50 dark:hover:bg-gray-850 transition"
+			class="block p-3 space-y-1 !no-underline hover:bg-gray-50 dark:hover:bg-gray-850 transition"
 		>
-			<p class="text-sm leading-snug font-medium text-gray-900 dark:text-gray-100">{title}</p>
+			<p class="text-sm leading-snug font-medium text-gray-900 dark:text-gray-100 !no-underline">{title}</p>
 			{#if meta}
-				<p class="text-xs text-gray-500 dark:text-gray-400">{meta}</p>
+				<p class="text-xs text-gray-500 dark:text-gray-400 !no-underline">{meta}</p>
 			{/if}
 		</a>
 	{:else}
 		<div class="p-3 space-y-1">
 			<p class="text-sm leading-snug font-medium">{title}</p>
 			{#if meta}
-				<p class="text-xs text-gray-500 dark:text-gray-400">{meta}</p>
+				<p class="text-xs text-gray-500 dark:text-gray-400 !no-underline">{meta}</p>
 			{/if}
 		</div>
 	{/if}
