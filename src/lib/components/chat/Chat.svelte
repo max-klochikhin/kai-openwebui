@@ -1555,6 +1555,14 @@
 		loading = true;
 		console.log('mounted');
 		window.addEventListener('message', onMessageHandler);
+		// Kai: listing cards ask the chat to send a follow-up message (e.g. "show more").
+		const onKaiSubmit = (event) => {
+			const text = event?.detail?.text;
+			if (typeof text === 'string' && text.trim()) {
+				submitHandler(text.trim());
+			}
+		};
+		window.addEventListener('kai:submit', onKaiSubmit);
 		$socket?.on('events', chatEventHandler);
 		$socket?.on('connect', handleSocketConnect);
 
@@ -1630,6 +1638,7 @@
 		init();
 
 		return () => {
+			window.removeEventListener('kai:submit', onKaiSubmit);
 			try {
 				clearTimeout(saveControlsTimer);
 				saveControls();
