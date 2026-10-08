@@ -1,10 +1,13 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import KaiPhotoViewer from './KaiPhotoViewer.svelte';
 
 	// Telegram-like album: every photo is shown, tiles follow each photo's orientation and size.
 	export let urls: string[] = [];
 	export let href: string | null = null;
 	export let title = '';
+	export let metaParts: { text: string; href?: string | null }[] = [];
+	export let description: string | null = null;
 
 	const DEFAULT_RATIO = 4 / 3;
 	const PRELOAD_TIMEOUT_MS = 8000;
@@ -13,21 +16,25 @@
 		| { kind: 'row'; idx: number[]; aspect: number }
 		| { kind: 'trio'; idx: [number, number, number]; aspect: number };
 
-	let items: { url: string; ratio: number }[] = [];
+	type Item = { url: string; full: string; ratio: number };
+	let items: Item[] = [];
 	let ready = false;
+	let viewerIndex: number | null = null;
 
 	// CDN sizes: $_57 = 1600 px (about 600 KB), $_20 = 800 px (about 120 KB).
 	const sized = (url: string) => url.replace('rule=$_57', 'rule=$_20');
 	const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
-	function measure(url: string): Promise<{ url: string; ratio: number } | null> {
+	function measure(full: string): Promise<Item | null> {
+		const url = sized(full);
 		return new Promise((resolve) => {
 			const img = new Image();
-			const timer = setTimeout(() => resolve({ url, ratio: DEFAULT_RATIO }), PRELOAD_TIMEOUT_MS);
+			const timer = setTimeout(() => resolve({ url, full, ratio: DEFAULT_RATIO }), PRELOAD_TIMEOUT_MS);
 			img.onload = () => {
 				clearTimeout(timer);
 				resolve({
 					url,
+					full,
 					ratio: img.naturalWidth && img.naturalHeight ? img.naturalWidth / img.naturalHeight : DEFAULT_RATIO
 				});
 			};
@@ -41,8 +48,8 @@
 	}
 
 	onMount(async () => {
-		const measured = await Promise.all(urls.filter(Boolean).map((u) => measure(sized(u))));
-		items = measured.filter((m): m is { url: string; ratio: number } => m !== null);
+		const measured = await Promise.all(urls.filter(Boolean).map((u) => measure(u)));
+		items = measured.filter((m): m is Item => m !== null);
 		ready = true;
 	});
 
@@ -112,12 +119,11 @@
 					style="grid-template-columns: 2fr 1fr; grid-template-rows: 1fr 1fr; aspect-ratio: {block.aspect}"
 				>
 					{#each block.idx as i, pos}
-						<svelte:element
-							this={href ? 'a' : 'div'}
-							{href}
-							target={href ? '_blank' : undefined}
-							rel={href ? 'noreferrer' : undefined}
-							class="block overflow-hidden bg-gray-100 dark:bg-gray-850 {pos === 0 ? 'row-span-2' : ''}"
+						<button
+							type="button"
+							aria-label="Open photo"
+							on:click={() => (viewerIndex = i)}
+							class="cursor-zoom-in block overflow-hidden bg-gray-100 dark:bg-gray-850 {pos === 0 ? 'row-span-2' : ''}"
 						>
 							<img
 								src={items[i].url}
@@ -125,18 +131,17 @@
 								referrerpolicy="no-referrer"
 								class="h-full w-full object-cover"
 							/>
-						</svelte:element>
+						</button>
 					{/each}
 				</div>
 			{:else}
 				<div class="flex gap-0.5" style="aspect-ratio: {block.aspect}">
 					{#each block.idx as i}
-						<svelte:element
-							this={href ? 'a' : 'div'}
-							{href}
-							target={href ? '_blank' : undefined}
-							rel={href ? 'noreferrer' : undefined}
-							class="block min-w-0 overflow-hidden bg-gray-100 dark:bg-gray-850"
+						<button
+							type="button"
+							aria-label="Open photo"
+							on:click={() => (viewerIndex = i)}
+							class="cursor-zoom-in block min-w-0 overflow-hidden bg-gray-100 dark:bg-gray-850"
 							style="flex: {items[i].ratio} 1 0%"
 						>
 							<img
@@ -145,10 +150,22 @@
 								referrerpolicy="no-referrer"
 								class="h-full w-full object-cover"
 							/>
-						</svelte:element>
+						</button>
 					{/each}
 				</div>
 			{/if}
 		{/each}
 	</div>
+{/if}
+
+{#if viewerIndex !== null}
+	<KaiPhotoViewer
+		urls={items.map((item) => item.full)}
+		index={viewerIndex}
+		{title}
+		{metaParts}
+		{description}
+		{href}
+		on:close={() => (viewerIndex = null)}
+	/>
 {/if}
